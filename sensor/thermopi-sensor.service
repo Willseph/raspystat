@@ -1,0 +1,12 @@
+[Unit]
+Description=Reports a GPIO-connected DS18B20 sensor's temperature to a ThermoPi server.
+After=network.target
+
+[Service]
+ExecStart=/home/pi/ThermoPi/sensor/sensor.py
+Restart=always
+Type=simple
+User=pi
+
+[Install]
+WantedBy=default.target
