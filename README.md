@@ -107,12 +107,7 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 
 * Thanks to Adafruit for their DS18B20 tutorial provided above.
 
-sudo mv thermopi-sensor.service /etc/systemd/system/thermopi-sensor.service
-pi@thermopi-2:~/ThermoPi/sensor $ sudo chmod 664 /etc/systemd/system/thermopi-sensor.service
-pi@thermopi-2:~/ThermoPi/sensor $ sudo systemctl daemon-reload
-pi@thermopi-2:~/ThermoPi/sensor $ sudo systemctl enable thermopi-sensor.service
-Created symlink from /etc/systemd/system/default.target.wants/thermopi-sensor.service to /etc/systemd/system/thermopi-sensor.service.
-pi@thermopi-2:~/ThermoPi/sensor $ sudo systemctl start thermopi-sensor.service
+
 ## Donate
 
 If you wish to buy me a coffee or beer, you can do so easily with Squarecash!
