@@ -48,19 +48,18 @@ def getEnvSettings():
 #####################################################################
 
 env = getEnvSettings()
-print env
-print ''
 
 pauseTime = 5
 secret = env['secret']
 url = env['host']+'/call/reportsensor'
 
 while True:
-	temp = str(ds18b20.readTemperature())
-	print 'Temp: '+temp
+	temp = ds18b20.readTemperature()
 	if temp:
-		resp = requests.post(url, data = {'secret':secret, 'temp':temp}).json()
+		print 'Temp: '+str(temp)
+		resp = requests.post(url, data = {'secret':secret, 'temp':str(temp)}).json()
 		print resp
+	else:
+		print 'Could not read temperature'
 
-	print ''
 	time.sleep(pauseTime)
