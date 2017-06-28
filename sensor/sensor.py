@@ -49,7 +49,7 @@ def getEnvSettings():
 
 env = getEnvSettings()
 
-pauseTime = 5
+pauseTime = 1
 secret = env['secret']
 url = env['host']+'/call/reportsensor'
 
