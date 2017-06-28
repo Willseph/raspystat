@@ -21,6 +21,7 @@ After=network.target
 [Service]
 ExecStart=/home/pi/ThermoPi/sensor/sensor.py
 Restart=always
+RestartSec=3
 Type=simple
 User=pi
 
