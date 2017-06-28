@@ -110,5 +110,5 @@ This project is licensed under the **GNU General Public License v3.0** - see the
 
 ## Donate
 
-If you wish to buy me a coffee or beer, you can do so easily with Squarecash!
+If you wish to buy me a coffee or beer, you can do so easily with Square Cash!
 <p align="center"><a href="https://cash.me/$willseph"><img src="https://i.imgur.com/cZMl8i0.png" alt="Donate" width="125" height="50"</a></p>
