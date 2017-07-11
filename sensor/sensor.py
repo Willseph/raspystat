@@ -24,6 +24,9 @@ import subprocess
 import sys
 import time
 
+def rebootPi():
+	os.system('sudo shutdown -r now')
+
 def getEnvSettings():
 	try:
 		path = os.path.dirname(os.path.abspath(__file__))
@@ -47,17 +50,33 @@ def getEnvSettings():
 
 #####################################################################
 
-env = getEnvSettings()
-
+attemptsSinceLastSent = 0
+maxAttempts = 30
 pauseTime = 1
-secret = env['secret']
-url = env['host']+'/call/reportsensor'
 
 while True:
+	env = getEnvSettings()
+	secret = env['secret']
+	url = env['host']+'/call/reportsensor'
+
 	temp = ds18b20.readTemperature()
 	if temp:
 		print 'Temp: '+str(temp)
-		resp = requests.post(url, data = {'secret':secret, 'temp':str(temp)}).json()
+		try:
+			resp = requests.post(url, data = {'secret':secret, 'temp':str(temp)}).json()
+		except:
+			print 'Could not report temperature.'
+			attemptsSinceLastSent = attemptsSinceLastSent+1
+			if(attemptsSinceLastSent > maxAttempts):
+				print 'Internet may be out. Rebooting Pi...'
+				time.sleep(1)
+				rebootPi()
+				break
+			else:
+				print 'Attempt '+str(attemptsSinceLastSent)+'/'+str(maxAttempts)+'...'
+				time.sleep(2)
+				continue
+		attemptsSinceLastSent = 0
 		print resp
 	else:
 		print 'Could not read temperature'
