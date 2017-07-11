@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [Unit]
-Description=Reports a GPIO-connected DS18B20 sensor's temperature to a ThermoPi server.
+Description=ThermoPi sensor service
 After=network.target
 
 [Service]
