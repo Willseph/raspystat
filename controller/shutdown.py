@@ -26,7 +26,9 @@ import time
 #####################################################################
 
 # Relay boolean constants. Flipped for Sainsmart relay module.
+BoardMode = gpio.BCM
 ConfigFileName = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+RelayReverse = False
 
 # Error codes
 ErrorExited = 'exited'
@@ -52,13 +54,29 @@ def postToApi (call, data, host, secret):
 	print 'API call failed: ' + str (resp)
 	return False
 
+# Enables or disables the provided pin
+def setPin (pin, enabled):
+	global RelayReverse
+	relayOn = False if RelayReverse else True
+	relayOff = (not relayOn)
+	gpio.output (pin, (relayOn if enabled else relayOff))
+
+# Enables or disables multiple pins in a given array
+def setPins (pins, enabled):
+	if enabled:
+		print 'Setting pins: '+str(pins)
+	else:
+		print 'Unsetting pins: '+str(pins)
+
+	for pin in pins:
+		setPin (pin, enabled)
+
 #####################################################################
 
 # Stopping controller service first
 os.system ('sudo service thermopi-controller stop')
 
 gpio.setwarnings (False)
-gpio.cleanup()
 
 # Loading config
 with open (ConfigFileName) as configFile:
@@ -78,6 +96,34 @@ if not host:
 if not secret:
 	print 'Error: No secret key specified in '+ConfigFileName
 	sys.exit (1)
+
+fanPins = getSafely ('fanPins', config)
+heatPins = getSafely ('heatPins', config)
+coolPins = getSafely ('coolPins', config)
+	
+if (not fanPins):
+	print 'Error: Fan pins undefined in '+ConfigFileName
+	sys.exit (1)
+	
+if (not heatPins):
+	print 'Error: Heat pins undefined in '+ConfigFileName
+	sys.exit (1)
+	
+if (not coolPins):
+	print 'Error: Cool pins undefined in '+ConfigFileName
+	sys.exit (1)
+
+RelayReverse = getSafely ('reverseRelays', config) is True
+	
+# Cleaning up GPIO
+gpio.setmode (BoardMode)
+allPins = list (set (fanPins) | set (heatPins) | set (coolPins))
+
+for pin in allPins:
+	gpio.setup(pin, gpio.OUT)
+
+setPins (allPins, False)
+gpio.cleanup()
 
 print 'Attemping one last status update'
 status = {"fan":0, "heat":0, "cool":0, "resting":0, "error":ErrorExited}
