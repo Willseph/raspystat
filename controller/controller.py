@@ -307,15 +307,8 @@ try:
 		status = {"fan":boolInt (fanOn), "heat":boolInt (heatOn), "cool":boolInt (coolOn), "resting":boolInt (compressorRest), "error":statusError}
 		attemptPostToApi ('reportstatus', status, host, secret, MaxAttempts)
 		print 'Status updated'
-		
-		# TODO: In this loop, pull the sensors & settings information from API
-		#       Using both sensors and settings, toggle fan/heat/cool
-		#       Ensure .5 degree threshold and rest times between compressor modes
-		#       Report status changes to API
-		#       Reboot on connection loss
-		#       Shut off HVAC after delay period (can probably just rely on autorebooting)
-		#	HVAC GPIO cleanup on shutdown
 		print
+
 		time.sleep (LoopDelaySeconds)
 
 except SystemExit:
