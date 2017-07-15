@@ -27,7 +27,7 @@ import traceback
 
 #####################################################################
 
-# Relay boolean constants. Flipped for Sainsmart relay module.
+# Constants
 BoardMode = gpio.BCM
 CompressorSafetyBufferSeconds = 60
 ConfigFileName = os.path.dirname(os.path.abspath(__file__))+'/config.json'
