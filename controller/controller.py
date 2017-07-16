@@ -88,6 +88,7 @@ def attemptPostToApi (call, data, host, secret, maxAttempts):
 	
 	return result
 
+# Returns 1 if b is "truthy", otherwise returns 0
 def boolInt (b):
 	return 1 if b else 0
 
