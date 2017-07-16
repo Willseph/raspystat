@@ -213,7 +213,6 @@ try:
 	setPins (allPins, False)
 	
 	# Beginning main loop
-	attemptsSinceLastSent = 0
 	lastCompressorChange = 0
 	
 	fanOn = False
