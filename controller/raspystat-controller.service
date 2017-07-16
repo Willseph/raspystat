@@ -1,4 +1,4 @@
-# ThermoPi
+# Raspystat
 # Copyright (C) 2017  William Thomas    
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [Unit]
-Description=ThermoPi controller service
+Description=Raspystat controller service
 After=network.target
 
 [Service]
-ExecStart=/home/pi/ThermoPi/controller/controller.py
+ExecStart=/home/pi/Raspystat/controller/controller.py
 Restart=always
 RestartSec=3
 Type=simple

@@ -1,4 +1,4 @@
-# ThermoPi
+# Raspystat
 # Copyright (C) 2017  William Thomas    
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -15,15 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 [Unit]
-Description=ThermoPi sensor service
-After=network.target
+Description=Raspystat controller shutdown cleanup service
+Before=shutdown.target
 
 [Service]
-ExecStart=/home/pi/ThermoPi/sensor/sensor.py
-Restart=always
-RestartSec=3
-Type=simple
-User=pi
+ExecStart=/bin/true
+ExecStop=/home/pi/Raspystat/controller/shutdown.py
+RemainAfterExit=yes
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

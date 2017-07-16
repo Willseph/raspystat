@@ -1,4 +1,4 @@
-End-User License Agreement for ThermoPi
+End-User License Agreement for Raspystat
 
 This End-User License Agreement (EULA) is a legal agreement between you (either an individual or a single entity) and the mentioned author (William Thomas) of this Software for the software product identified above, which includes computer software and may include associated media, printed materials, and “online” or electronic documentation (“SOFTWARE PRODUCT”).
 
@@ -6,7 +6,7 @@ By installing, copying, or otherwise using the SOFTWARE PRODUCT, you agree to be
 If you do not agree to the terms of this EULA, do not install or use the SOFTWARE PRODUCT.
 
 SOFTWARE PRODUCT LICENSE
-a) ThermoPi is being distributed as Freeware for personal, commercial use, non-profit organization, educational purpose. It may be included with CD-ROM/DVD-ROM distributions. You are NOT allowed to make a charge for distributing this Software (either for profit or merely to recover your media and distribution costs) whether as a stand-alone product, or as part of a compilation or anthology, nor to use it for supporting your business or customers. It may be distributed freely on any website or through any other distribution mechanism, as long as no part of it is changed in any way.
+a) Raspystat is being distributed as Freeware for personal, commercial use, non-profit organization, educational purpose. It may be included with CD-ROM/DVD-ROM distributions. You are NOT allowed to make a charge for distributing this Software (either for profit or merely to recover your media and distribution costs) whether as a stand-alone product, or as part of a compilation or anthology, nor to use it for supporting your business or customers. It may be distributed freely on any website or through any other distribution mechanism, as long as no part of it is changed in any way.
 
 1. GRANT OF LICENSE. This EULA grants you the following rights: Installation and Use. You may install and use an unlimited number of copies of the SOFTWARE PRODUCT.
 
@@ -20,7 +20,7 @@ The SOFTWARE PRODUCT may be included in any free or non-profit packages or produ
 Limitations on Reverse Engineering, Decompilation, Disassembly and change (add,delete or modify) the resources in the compiled the assembly. You may not reverse engineer, decompile, or disassemble the SOFTWARE PRODUCT, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
 
 Update and Maintenance
-Updates to ThermoPi will be distributed via changes to the orginal GitHub repository (https://github.com/Willseph/ThermoPi). It is the responsibility of you and you alone to update ThermoPi via the standard Git commands only from the official repository if and when new updates are available.
+Updates to Raspystat will be distributed via changes to the orginal GitHub repository (https://github.com/Willseph/Raspystat). It is the responsibility of you and you alone to update Raspystat via the standard Git commands only from the official repository if and when new updates are available.
 
 Separation of Components.
 The SOFTWARE PRODUCT is licensed as a single product. Its component parts may not be separated for use on more than one computer.

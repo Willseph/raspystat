@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# ThermoPi
+# Raspystat
 # Copyright (C) 2017  William Thomas
 # 
 # This program is free software: you can redistribute it and/or modify

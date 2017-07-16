@@ -1,4 +1,4 @@
-# ThermoPi
+# Raspystat
 
 A distributed-sensor Raspberry Pi thermostat solution.
 
@@ -13,7 +13,7 @@ This project is split into three components:
 * HVAC controller
 * Web server (LAMP)
 
-A typical deployment of ThermoPi should generally consist of one Raspberry Pi for the HVAC Controller, one Raspberry Pi for each sensor (of which you may have multiple within your home), and a machine capable of running a LAMP stack for the web server.
+A typical deployment of Raspystat should generally consist of one Raspberry Pi for the HVAC Controller, one Raspberry Pi for each sensor (of which you may have multiple within your home), and a machine capable of running a LAMP stack for the web server.
 
 Using multiple sensors will allow you to toggle specific sensors within your home, effectively controlling which ones contribute, or do not contribute, to the overall average temperature within your home. However, only one sensor is required.
 
@@ -22,7 +22,7 @@ Additionally, it is entirely possible to deploy the HVAC controller and the web 
 
 ## Prerequisites
 
-ThermoPi requires the following packages:
+Raspystat requires the following packages:
 
 * Git
 * Python 2.7
@@ -41,7 +41,7 @@ Coming soon
 
 In order for your sensor Pi to sense the ambient temperature around it, it must be connected to a temperature sensor compoment. This project uses the inexpensive *DS18B20* component (about $2.50 USD each from [Amazon](https://www.amazon.com/Industry-Park-DS18B20-Thermometer-Temperature/dp/B01IVMJ1L2)), but the `sensor.py` file could be modified to use any sort of GPIO-connected sensor.
 
-**[Click here to visit Adafruit's tutorial on how to connect the DS18B20 temperature sensor to a Raspberry Pi](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/)**. You will not need any of the sample code from that tutorial for ThermoPi, but the device must be visible via the `/sys/bus/w1` OneWire interface by adding this line to your Pi's `/boot/config.txt` file and rebooting the Pi:
+**[Click here to visit Adafruit's tutorial on how to connect the DS18B20 temperature sensor to a Raspberry Pi](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/)**. You will not need any of the sample code from that tutorial for Raspystat, but the device must be visible via the `/sys/bus/w1` OneWire interface by adding this line to your Pi's `/boot/config.txt` file and rebooting the Pi:
 
 ```
 dtoverlay=w1-gpio
@@ -51,12 +51,12 @@ This guide assumes your sensor Pis are running at least Raspbian Jessie Lite 4.9
 
 It also assumes your primary admin user on the Pi is the default `pi` user. Make any adjustments necessary to the commands below if need be.
 
-Clone this `ThermoPi` repo into your home directory and enter the `sensor` subdirectory:
+Clone this `Raspystat` repo into your home directory and enter the `sensor` subdirectory:
 
 ```
 cd ~/
-git clone git@github.com:Willseph/ThermoPi.git
-cd ThermoPi/sensor
+git clone git@github.com:Willseph/Raspystat.git
+cd Raspystat/sensor
 ```
 
 Make the `sensor.py` script executable:
@@ -65,14 +65,14 @@ Make the `sensor.py` script executable:
 sudo chmod +x sensor.py
 ```
 
-Move or copy the `thermopi-sensor.service` daemon unit file into your system's unit file directory, give it the right permissions, reload your unit files, enable, and finally start the service:
+Move or copy the `raspystat-sensor.service` daemon unit file into your system's unit file directory, give it the right permissions, reload your unit files, enable, and finally start the service:
 
 ```
-sudo mv thermopi-sensor.service /etc/systemd/system/thermopi-sensor.service
-sudo chmod 664 /etc/systemd/system/thermopi-sensor.service
+sudo mv raspystat-sensor.service /etc/systemd/system/raspystat-sensor.service
+sudo chmod 664 /etc/systemd/system/raspystat-sensor.service
 sudo systemctl daemon-reload
-sudo systemctl enable thermopi-sensor.service
-sudo systemctl start thermopi-sensor.service
+sudo systemctl enable raspystat-sensor.service
+sudo systemctl start raspystat-sensor.service
 ```
 
 After a few seconds, you should now see this sensor's temperature begin updating on the web app. If you don't, double-check that you have added the correct information in your `.env` file.
@@ -89,7 +89,7 @@ Coming soon
 
 * **William Thomas** - *Primary author* - [Willseph](https://github.com/Willseph)
 
-See also the list of [contributors](https://github.com/Willseph/ThermoPi/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/Willseph/Raspystat/contributors) who participated in this project.
 
 
 ## Built With
