@@ -20,7 +20,7 @@ The SOFTWARE PRODUCT may be included in any free or non-profit packages or produ
 Limitations on Reverse Engineering, Decompilation, Disassembly and change (add,delete or modify) the resources in the compiled the assembly. You may not reverse engineer, decompile, or disassemble the SOFTWARE PRODUCT, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
 
 Update and Maintenance
-Updates to Raspystat will be distributed via changes to the orginal GitHub repository (https://github.com/Willseph/Raspystat). It is the responsibility of you and you alone to update Raspystat via the standard Git commands only from the official repository if and when new updates are available.
+Updates to Raspystat will be distributed via changes to the original GitHub repository (https://github.com/Willseph/Raspystat). It is the responsibility of you and you alone to update Raspystat via the standard Git commands only from the official repository if and when new updates are available.
 
 Separation of Components.
 The SOFTWARE PRODUCT is licensed as a single product. Its component parts may not be separated for use on more than one computer.

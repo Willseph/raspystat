@@ -1,3 +1,4 @@
+*\.pyc
 \.env
 sensor/config\.json
 controller/config\.json

@@ -74,7 +74,7 @@ def setPins (pins, enabled):
 #####################################################################
 
 # Stopping controller service first
-os.system ('sudo service thermopi-controller stop')
+os.system ('sudo service raspystat-controller stop')
 
 gpio.setwarnings (False)
 
