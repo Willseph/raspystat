@@ -22,7 +22,7 @@ if [[ $EUID -eq 0 ]]; then
 	exit 1
 fi
 
-UNIT="sensor"
+UNIT="controller"
 RASPYSTAT_DIR="$HOME/Raspystat"
 UNIT_DIR="$RASPYSTAT_DIR/$UNIT"
 CONFIG="$UNIT_DIR/config.json"
