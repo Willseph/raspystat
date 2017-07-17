@@ -29,7 +29,8 @@ import traceback
 #####################################################################
 
 # Constants
-ConfigFileName = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+Path = os.path.dirname(os.path.abspath(__file__))+'/..'
+ConfigFileName = Path+'/sensor/config.json'
 LoopDelaySeconds = 1
 MaxAttempts = 20
 ReadTempAttempts = 5
@@ -151,6 +152,7 @@ def rebootPi ():
 #####################################################################
 
 currentTemp = 1
+verString = ''
 
 try:
 	# Loading config
@@ -193,8 +195,14 @@ try:
 		else:
 			print 'Temp: ' + str (currentTemp)
 		
+		# Version info
+		verBranch = subprocess.check_output (['git', '--git-dir', (Path+'/.git'), 'rev-parse', '--abbrev-ref', 'HEAD']).strip ()
+		verClean = (subprocess.check_output (['git', '--git-dir', (Path+'/.git'), '--work-tree', Path, 'status']).strip ()).find ("working directory clean") > -1
+		verCommit = subprocess.check_output (['git', '--git-dir', (Path+'/.git'), 'log', '-n', '1', '--pretty=format:%H']).strip ()
+		verString = verBranch +','+ verCommit +','+ ('clean' if verClean else 'dirty')
+
 		# Reporting to API
-		status = {"temp":currentTemp, "error":statusError}
+		status = {"temp":currentTemp, "error":statusError, "ver":verString}
 		attemptPostToApi ('reportsensor', status, host, secret, MaxAttempts)
 		print 'Sensor updated'
 		print
@@ -216,5 +224,5 @@ except:
 	print tb
 
 print 'Attemping one last status update'
-status = {"temp":currentTemp, "error":ErrorExited}
+status = {"temp":currentTemp, "error":ErrorExited, "ver":verString}
 postToApi ('reportsensor', status, host, secret)

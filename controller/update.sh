@@ -53,6 +53,8 @@ echo ""
 echo "Replacing daemons"
 sudo cp ${UNIT_DIR}/${MAIN_DAEMON}.service /etc/systemd/system/${MAIN_DAEMON}.service
 sudo cp ${UNIT_DIR}/${SHUTDOWN_DAEMON}.service /etc/systemd/system/${SHUTDOWN_DAEMON}.service
+sudo chmod 664 /etc/systemd/system/${MAIN_DAEMON}.service
+sudo chmod 664 /etc/systemd/system/${SHUTDOWN_DAEMON}.service
 echo ""
 
 echo "Reloading daemons"
