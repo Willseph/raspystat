@@ -28,9 +28,10 @@ import traceback
 #####################################################################
 
 # Constants
+Path = os.path.dirname(os.path.abspath(__file__))+'/..'
 BoardMode = gpio.BCM
 CompressorSafetyBufferSeconds = 60
-ConfigFileName = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+ConfigFileName = Path+'/controller/config.json'
 LoopDelaySeconds = 1
 MaxAttempts = 20
 RelayReverse = False
@@ -163,6 +164,7 @@ def setPins (pins, enabled):
 
 allPins = []
 gpio.setwarnings (False)
+verString = ''
 
 try:
 	# Loading config
@@ -304,7 +306,13 @@ try:
 		setPins (enabledPins, True)
 		setPins (disabledPins, False)
 
-		status = {"fan":boolInt (fanOn), "heat":boolInt (heatOn), "cool":boolInt (coolOn), "resting":boolInt (compressorRest), "error":statusError}
+		# Version info
+		verBranch = subprocess.check_output (['git', '--git-dir', (Path+'/.git'), 'rev-parse', '--abbrev-ref', 'HEAD']).strip ()
+		verClean = (subprocess.check_output (['git', '--git-dir', (Path+'/.git'), '--work-tree', Path, 'status']).strip ()).find ("working directory clean") > -1
+		verCommit = subprocess.check_output (['git', '--git-dir', (Path+'/.git'), 'log', '-n', '1', '--pretty=format:%H']).strip ()
+		verString = verBranch +','+ verCommit +','+ ('clean' if verClean else 'dirty')
+
+		status = {"fan":boolInt (fanOn), "heat":boolInt (heatOn), "cool":boolInt (coolOn), "resting":boolInt (compressorRest), "error":statusError, "ver":verString}
 		attemptPostToApi ('reportstatus', status, host, secret, MaxAttempts)
 		print 'Status updated'
 		print
@@ -330,5 +338,5 @@ setPins (allPins, False)
 gpio.cleanup ()
 
 print 'Attemping one last status update'
-status = {"fan":0, "heat":0, "cool":0, "resting":0, "error":ErrorExited}
+status = {"fan":0, "heat":0, "cool":0, "resting":0, "error":ErrorExited, "ver":verString}
 postToApi ('reportstatus', status, host, secret)
