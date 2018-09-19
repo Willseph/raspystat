@@ -51,7 +51,7 @@ dtoverlay=w1-gpio
 
 This guide assumes your sensor Pis are running at least Raspbian Jessie Lite 4.9. Running another distro or version may cause the example commands below to behave unexpectedly.
 
-It also assumes your primary admin user on the Pi is the default `pi` user. Make any adjustments necessary to the commands below if need be.
+It also assumes your primary admin users on the Pis are the default `pi` user. Make any adjustments necessary to the commands below if need be.
 
 Ensure that you have updated your existing packages, and you have installed the necessary packages:
 ```
@@ -125,7 +125,84 @@ If you find yourself in a scenario where the Pi is constantly rebooting, making 
 
 ### HVAC controller Raspberry Pi installation
 
-Coming soon...ish
+In order for your controller Pi to control the HVAC unit in your home, you need to physically wire the Pi up to the wires that control the HVAC unit. This project accomplishes this by using a four-channel relay module, which is relatively cheap, and takes the guesswork out of voltages and current when it comes to your HVAC interface.
+
+##### TODO: Add GPIO wiring instructions.
+
+This guide assumes your controller Pi is running at least Raspbian Jessie Lite 4.9. Running another distro or version may cause the example commands below to behave unexpectedly.
+
+It also assumes your primary admin user on the Pi is the default `pi` user. Make any adjustments necessary to the commands below if need be.
+
+Ensure that you have updated your existing packages, and you have installed the necessary packages:
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install git python-pip
+```
+
+Install the necessary **pip** packages:
+```
+pip install requests
+```
+
+Clone this `Raspystat` repo into your home directory and enter the `controller` subdirectory:
+```
+cd ~/
+git clone https://github.com/Willseph/raspystat
+cd raspystat/controller
+```
+
+Make the necessary Python scripts executable:
+```
+chmod +x controller.py
+chmod +x shutdown.py
+chmod +x watchdog.py
+```
+
+Modify the `config.json.example` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the controller (see the ***Web server*** section). Remove the hint lines as well.
+
+Then, move the file to `config.json`:
+```
+mv config.json.example config.json
+```
+
+If you are hosting the server on this same Pi, you may use the address `127.0.0.1` for the host. However, it is recommended that you actually use the LAN address instead, because it will act as an additional connectivity check for the watchdog to ensure the controller is still connected to the network.
+
+Move or copy the `raspystat-controller.service` daemon unit file into your system's unit file directory, give it the right permissions, reload your unit files, enable, and finally start the service:
+```
+sudo mv raspystat-controller.service /etc/systemd/system/raspystat-controller.service
+sudo chmod 664 /etc/systemd/system/raspystat-controller.service
+sudo systemctl daemon-reload
+sudo systemctl enable raspystat-controller.service
+sudo systemctl start raspystat-controller.service
+```
+
+After a few seconds, the yellow warning status on the Raspystat interface should disappear. If you have not set up any sensors yet, you still won't see any temperature reading on the web app. If the yellow warning status on the web app has not gone, double-check that you have added the correct information in your `config.json` file.
+
+If you are still having trouble, you may need to attempt to run the `controller.py` script manually and use the output to debug the issue.
+
+To set up the shutdown daemon, repeat the same step as before, but with the `raspystat-controller-shutdown.service` daemon unit:
+```
+sudo mv raspystat-controller-shutdown.service /etc/systemd/system/raspystat-controller-shutdown.service
+sudo chmod 664 /etc/systemd/system/raspystat-controller-shutdown.service
+sudo systemctl daemon-reload
+sudo systemctl enable raspystat-controller-shutdown.service
+sudo systemctl start raspystat-controller-shutdown.service
+```
+
+In order to set up the Watchdog which automatically reboots the Pi if something seems to be going wrong, you will need to edit your crontab:
+```
+crontab -e
+```
+
+Then, add the following line to set up the cron job to execute every two minutes:
+```
+*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/controller/watchdog.py
+```
+
+The Watchdog job should ensure that, in the event that a network hiccup or other kind of unforseen issue occurs which causes the `controller.py` script to lock up or exit, the Pi will reboot and things should return to normal.
+
+If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab again and remove or comment the previous addition.
 
 
 ## Authors
