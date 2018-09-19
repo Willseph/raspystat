@@ -83,6 +83,7 @@ try:
 	
 	# Beginning main loop
 	while True:
+		time.sleep (LoopDelaySeconds)
 		print '----------'
 		currentTemp = 1
 		statusError = None
@@ -128,7 +129,6 @@ try:
 			
 		print '----------'
 		print
-		time.sleep (LoopDelaySeconds)
 
 except SystemExit:
 	print
