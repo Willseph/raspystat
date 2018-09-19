@@ -33,14 +33,14 @@ Raspystat requires the following packages:
 More to come soon
 
 
-## Installing
+## Installation
 
-#### Web Server
+### Web Server installation
 
 Coming soon...ish
 
 
-#### Sensor Raspberry Pi
+### Sensor Raspberry Pi installation
 
 In order for your sensor Pi to sense the ambient temperature around it, it must be connected to a temperature sensor compoment. This project uses the inexpensive *DS18B20* component (about $2.50 USD each from [Amazon](https://www.amazon.com/Industry-Park-DS18B20-Thermometer-Temperature/dp/B01IVMJ1L2)), but the `sensor.py` file could be modified to use any sort of GPIO-connected sensor.
 
@@ -123,7 +123,7 @@ The Watchdog job should ensure that, in the event that a network hiccup or other
 If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab again and remove or comment the previous addition.
 
 
-#### HVAC Controller Raspberry Pi
+### HVAC controller Raspberry Pi installation
 
 Coming soon...ish
 
