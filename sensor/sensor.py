@@ -20,7 +20,6 @@ import ds18b20
 import json
 import os
 import requests
-import RPi.GPIO as gpio;
 import subprocess
 import sys
 import time
