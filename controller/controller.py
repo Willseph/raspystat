@@ -33,7 +33,6 @@ BoardMode = gpio.BCM
 CompressorSafetyBufferSeconds = 60
 ConfigFileName = Path+'/controller/config.json'
 LoopDelaySeconds = 1
-MaxAttempts = 20
 RelayReverse = False
 TemperatureChangeThreshold = 0.5
 
@@ -42,52 +41,6 @@ ErrorExited = 'exited'
 ErrorMinMaxOverlap = 'min-max-overlap'
 
 #####################################################################
-
-# Attempts to GET an item from the API. After failing too many times, reboot is called
-def attemptGetFromApi (call, obj, host, secret, maxAttempts):
-	attempts = 0
-	result = None
-	while (result is None and attempts <= maxAttempts):
-		try:
-			result = getFromApi (call, obj, host, secret)
-		except:
-			pass
-
-		if (not result):
-			attempts += 1
-			print 'Error getting '+obj+'. Attempt '+str(attempts)+'/'+str(maxAttempts)+'...'
-			time.sleep (1)
-			continue
-	
-	if (not result):
-		print 'Could not GET '+obj+'. Internet may be offline or config may be wrong.'
-		rebootPi ()
-	
-	return result
-
-# Attempts to POST an item to the API. After failing too many times, reboot is called
-def attemptPostToApi (call, data, host, secret, maxAttempts):
-	attempts = 0
-	result = None
-	while (result is None and attempts <= maxAttempts):
-		try:
-			result = postToApi (call, data, host, secret)
-		except:
-			pass
-
-		if (not result is True):
-			attempts += 1
-			print 'Error posting data to API. Attempt '+str(attempts)+'/'+str(maxAttempts)+'...'
-			print '   - ' + str (result)
-			print
-			time.sleep (1)
-			continue
-	
-	if (not result):
-		print 'Could not POST. Internet may be offline or config may be wrong.'
-		rebootPi ()
-	
-	return result
 
 # Returns 1 if b is "truthy", otherwise returns 0
 def boolInt (b):
@@ -222,12 +175,44 @@ try:
 	heatOn = False
 	coolOn = False
 	while True:
+		time.sleep (LoopDelaySeconds)
+		print '----------'
+		
+		currentTime = int (time.time ())
+		print 'Current time: '+str(currentTime)
+
 		compressorRest = False
 		statusError = None
 		
-		# Pulling sensors and settings from API
-		settings = attemptGetFromApi ('settings', 'settings', host, secret, MaxAttempts)
-		sensors = attemptGetFromApi ('sensors', 'sensors', host, secret, MaxAttempts)
+		# Pulling settings from API
+		settings = None
+		try:
+			settings = getFromApi ('settings', 'settings', host, secret)
+		except:
+			print 'Could not pull settings from API:'
+			print traceback.format_exc ()
+			continue
+		if not settings:
+			print 'Could not pull settings from API.'
+			print '----------'
+			print
+			continue
+		
+		# Pulling sensors from API
+		sensors = None
+		try:
+			sensors = getFromApi ('sensors', 'sensors', host, secret)
+		except:
+			print 'Could not pull sensors from API:'
+			print traceback.format_exc ()
+			print '----------'
+			print
+			continue
+		if not settings:
+			print 'Could not pull sensors from API.'
+			print '----------'
+			print
+			continue
 		
 		fanSettingEnabled = getSafely ('fan', settings) is True
 		heatSettingEnabled = getSafely ('heat', settings) is True
@@ -264,8 +249,6 @@ try:
 			coolOn = coolSettingEnabled and hotEnoughForAir (maxTempFormatted, formattedTemp, coolOn)
 			heatOn = heatSettingEnabled and coldEnoughForHeat (minTempFormatted, formattedTemp, heatOn)
 		
-		currentTime = int (time.time ())
-		
 		# If min/max temperatures are overlapping, and heat/cool modes are both enabled, we have a problem
 		if (coolOn and heatOn):
 			coolOn = False
@@ -291,7 +274,6 @@ try:
 			if (coolPreviouslyOn != coolOn or heatPreviouslyOn != heatOn):
 				lastCompressorChange = currentTime
 			
-		print str(currentTime)		
 		print str(formattedTemp)
 		print 'Fan: '+str(fanOn)
 		print 'Heat: '+str(heatOn)
@@ -313,11 +295,18 @@ try:
 		verString = verBranch +','+ verCommit +','+ ('clean' if verClean else 'dirty')
 
 		status = {"fan":boolInt (fanOn), "heat":boolInt (heatOn), "cool":boolInt (coolOn), "resting":boolInt (compressorRest), "error":statusError, "ver":verString}
-		attemptPostToApi ('reportstatus', status, host, secret, MaxAttempts)
-		print 'Status updated'
-		print
+		try:
+			success = postToApi ('reportstatus', status, host, secret)
+			if success is True:
+				print 'Status updated'
+			else:
+				print 'Could not update controller status to API.'
+		except:
+			print 'Error updating controller status:'
+			print traceback.format_exc ()
 
-		time.sleep (LoopDelaySeconds)
+		print '----------'
+		print
 
 except SystemExit:
 	print
@@ -330,8 +319,7 @@ except KeyboardInterrupt:
 except:
 	print
 	print 'Error occurred:'
-	tb = traceback.format_exc ()
-	print tb
+	print traceback.format_exc ()
 
 print 'Shutting down GPIO...'
 setPins (allPins, False)
