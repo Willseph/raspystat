@@ -108,14 +108,14 @@ sudo systemctl enable raspystat-sensor-shutdown.service
 sudo systemctl start raspystat-sensor-shutdown.service
 ```
 
-In order to set up the Watchdog which automatically reboots the Pi if something seems to be going wrong, you will need to edit your crontab via:
+In order to set up the Watchdog which automatically reboots the Pi if something seems to be going wrong, you will need to edit your crontab:
 ```
 crontab -e
 ```
 
 Then, add the following line to set up the cron job to execute every two minutes:
 ```
-*/2 * * * * /usr/bin/python /home/pi/raspystat/sensor/watchdog.py > /var/log/raspystat-watchdog.log
+*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/sensor/watchdog.py
 ```
 
 The Watchdog job should ensure that, in the event that a network hiccup or other kind of unforseen issue occurs which causes the `sensor.py` script to lock up or exit, the Pi will reboot and things should return to normal.

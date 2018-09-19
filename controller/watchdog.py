@@ -19,7 +19,6 @@
 import json
 import os
 import requests
-import subprocess
 import sys
 import time
 import traceback
@@ -28,11 +27,8 @@ import traceback
 
 # Constants
 Path = os.path.dirname(os.path.abspath(__file__))+'/..'
-ConfigFileName = Path+'/sensor/config.json'
+ConfigFileName = Path+'/controller/config.json'
 DeathTimeSeconds = 120
-
-# Error codes
-ErrorSensorError = 'sensor-error'
 
 #####################################################################
 
@@ -91,30 +87,34 @@ try:
 		print 'Error: No secret key specified in '+ConfigFileName
 		sys.exit (1)
 	
-	# Fetching current status
-	sensors = None
+	# Fetching controller status
+	controller = None
 	try:
-		sensors = getFromApi ('sensors', 'sensors', host, secret)
+		controller = getFromApi ('controller', 'controller', host, secret)
 	except:
 		print
-		print 'Error occurred getting sensors from API:'
+		print 'Error occurred getting controller from API:'
 		tb = traceback.format_exc ()
 		print tb
 		print
 		needsToReboot = True
 	
-	if sensors:
-		if len (sensors) < 1:
-			print 'No sensors with provided secret found in API. Web may not be configured.'
+	if controller:
+		updatedTime = getSafely ('updated', controller)
+		if not updatedTime:
+			print 'Error occurred getting controller from API.'
+			needsToReboot = True
 		else:
-			sensor = sensors[0]
-			sensorTime = sensor['updated']
-			print 'Last update time: '+str(sensorTime)
-			difference = currentTime - sensorTime
+			updatedTime = int(updatedTime)
+			print 'Last update time: '+str(updatedTime)
+			difference = currentTime - updatedTime
 			print 'Time difference: '+str(difference)+' second(s).'
 			if difference >= DeathTimeSeconds:
-				print 'Sensor has not been updated in longer than '+str(DeathTimeSeconds)+' seconds. This is cause for rebooting.'
+				print 'Controller has not been updated in longer than '+str(DeathTimeSeconds)+' seconds. This is cause for rebooting.'
 				needsToReboot = True
+	else:
+		print 'Error occurred getting controller from API.'
+		needsToReboot = True
 
 except SystemExit:
 	print
@@ -134,6 +134,6 @@ if needsToReboot:
 	print 'Something is wrong. We need to reboot.'
 	rebootPi ()
 else:
-	print 'Sensor status is valid. No need to reboot.'
+	print 'Controller status is valid. No need to reboot.'
 	print '----------'
 	print
