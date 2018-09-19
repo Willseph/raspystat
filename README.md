@@ -68,7 +68,7 @@ pip install requests
 Clone this `Raspystat` repo into your home directory and enter the `sensor` subdirectory:
 ```
 cd ~/
-git clone git@github.com:willseph/raspystat.git
+git clone https://github.com/Willseph/raspystat
 cd raspystat/sensor
 ```
 
