@@ -19,7 +19,7 @@ Description=Raspystat sensor service
 After=network.target
 
 [Service]
-ExecStart=/home/pi/Raspystat/sensor/sensor.py
+ExecStart=/home/pi/raspystat/sensor/sensor.py
 Restart=always
 RestartSec=3
 Type=simple

@@ -1,0 +1,7 @@
+{
+	# Replace with the secret key for this sensor
+	"secret" : "xxxxxxxxxx",
+
+	# Replace with the LAN address to the Raspystat home screen
+	"host" : "http://192.168.1.xxx/raspystat"
+}
