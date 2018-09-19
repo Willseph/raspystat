@@ -1,0 +1,8 @@
+{
+	# Replace with the secret key for this controller
+	"secret" : "xxxxxxxxxx",
+
+	# Replace with the LAN address to the Raspystat home screen
+	# If hosting locally, the LAN address is still recommended, not 127.0.0.1
+	"host" : "http://192.168.1.xxx/raspystat"
+}

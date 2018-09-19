@@ -20,7 +20,7 @@ Before=shutdown.target
 
 [Service]
 ExecStart=/bin/true
-ExecStop=/home/pi/Raspystat/sensor/shutdown.py
+ExecStop=/home/pi/raspystat/sensor/shutdown.py
 RemainAfterExit=yes
 
 [Install]

@@ -19,7 +19,7 @@ Description=Raspystat controller service
 After=network.target
 
 [Service]
-ExecStart=/home/pi/Raspystat/controller/controller.py
+ExecStart=/home/pi/raspystat/controller/controller.py
 Restart=always
 RestartSec=3
 Type=simple

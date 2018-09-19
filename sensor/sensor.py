@@ -31,98 +31,13 @@ import traceback
 # Constants
 Path = os.path.dirname(os.path.abspath(__file__))+'/..'
 ConfigFileName = Path+'/sensor/config.json'
-LoopDelaySeconds = 1
-MaxAttempts = 20
-ReadTempAttempts = 5
+LoopDelaySeconds = 5
 
 # Error codes
 ErrorExited = 'exited'
 ErrorSensorError = 'sensor-error'
 
 #####################################################################
-
-# Attempts to GET an item from the API. After failing too many times, reboot is called
-def attemptGetFromApi (call, obj, host, secret, maxAttempts):
-	attempts = 0
-	result = None
-	while (result is None and attempts <= maxAttempts):
-		try:
-			result = getFromApi (call, obj, host, secret)
-		except:
-			pass
-
-		if (not result):
-			attempts += 1
-			print 'Error getting '+obj+'. Attempt '+str(attempts)+'/'+str(maxAttempts)+'...'
-			time.sleep (1)
-			continue
-	
-	if (not result):
-		print 'Could not GET '+obj+'. Internet may be offline or config may be wrong.'
-		rebootPi ()
-	
-	return result
-
-# Attempts to POST an item to the API. After failing too many times, reboot is called
-def attemptPostToApi (call, data, host, secret, maxAttempts):
-	attempts = 0
-	result = None
-	while (result is None and attempts <= maxAttempts):
-		try:
-			result = postToApi (call, data, host, secret)
-		except:
-			pass
-
-		if (not result is True):
-			attempts += 1
-			print 'Error posting data to API. Attempt '+str(attempts)+'/'+str(maxAttempts)+'...'
-			print '   - ' + str (result)
-			print
-			time.sleep (1)
-			continue
-	
-	if (not result):
-		print 'Could not POST. Internet may be offline or config may be wrong.'
-		rebootPi ()
-	
-	return result
-
-# Attempts to read the temperature from the ds18b20 sensor, and returns None if cannot
-def attemptReadTemp (maxAttempts):
-	readAttempts = 0
-	temp = None
-
-	while readAttempts < maxAttempts:
-		try:
-			print 'Reading temp...'
-			temp = ds18b20.readTemperature ()
-
-		except KeyboardInterrupt:
-			return False
-
-		except SystemExit:
-			return False
-
-		except:
-			pass
-
-		if ((not temp) or temp <= 1):
-			readAttempts += 1
-			print 'Could not read temp. Attempt ' + str (readAttempts) + '/' + str (maxAttempts) + '...'
-			print
-		else:
-			return temp
-	
-	return None
-
-# Makes a GET call to the API
-def getFromApi (call, obj, host, secret):
-	url = host+'/call/'+call
-	resp = requests.get(url, params={'controller':secret}).json()
-	if (getSafely ('success', resp) is True and not (getSafely (obj, resp) is None)):
-		return resp[obj]
-	print 'API call failed: '+str(resp)
-	return None
 
 # Safely gets a value from a dictionary by its key, or returns None on error
 def getSafely (key, config):
@@ -141,13 +56,6 @@ def postToApi (call, data, host, secret):
 		return True
 	print 'API call failed: ' + str (resp)
 	return False
-
-# Sets a 5-second timer, then forces a shutdown signal
-def rebootPi ():
-	print 'Rebooting pi in 5 seconds...'
-	time.sleep(5)
-	os.system('sudo shutdown -r now')
-	sys.exit (0)
 
 #####################################################################
 
@@ -176,24 +84,29 @@ try:
 	
 	# Beginning main loop
 	while True:
+		print '----------'
 		currentTemp = 1
 		statusError = None
 		
 		currentTime = int (time.time ())
-		print str(currentTime)
+		print 'Current time: '+str(currentTime)
 		
 		# Reading from sensor
-		currentTemp = attemptReadTemp (ReadTempAttempts)
-		
-		# Hacky, don't look!
-		if (currentTemp is False):
-			break
+		try:
+			print 'Reading temp...'
+			currentTemp = ds18b20.readTemperature ()
+			if currentTemp is None:
+				print 'Could not read temperature from ds18b20 device. Ensure wiring is correct.'
+			else:
+				print 'Current temperature: '+str(currentTemp/1000.0)+' C'
+		except:
+			print 'Exception occurred reading temperature:'
+			print traceback.format_exc ()
+			print
 		
 		if ((not currentTemp) or currentTemp <= 1):
 			print 'Error reading from sensor.'
 			statusError = ErrorSensorError
-		else:
-			print 'Temp: ' + str (currentTemp)
 		
 		# Version info
 		verBranch = subprocess.check_output (['git', '--git-dir', (Path+'/.git'), 'rev-parse', '--abbrev-ref', 'HEAD']).strip ()
@@ -203,10 +116,19 @@ try:
 
 		# Reporting to API
 		status = {"temp":currentTemp, "error":statusError, "ver":verString}
-		attemptPostToApi ('reportsensor', status, host, secret, MaxAttempts)
-		print 'Sensor updated'
+		try:
+			print 'Reporting status to server...'
+			success = postToApi ('reportsensor', status, host, secret)
+			if success is True:
+				print 'Sensor updated'
+			else:
+				print 'Failed to update sensor on server'
+		except:
+			print 'Error posting to API:'
+			print traceback.format_exc ()
+			
+		print '----------'
 		print
-
 		time.sleep (LoopDelaySeconds)
 
 except SystemExit:
