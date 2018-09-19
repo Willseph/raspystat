@@ -74,9 +74,9 @@ cd raspystat/sensor
 
 Make the necessary Python scripts executable:
 ```
-sudo chmod +x sensor.py
-sudo chmod +x shutdown.py
-sudo chmod +x watchdog.py
+chmod +x sensor.py
+chmod +x shutdown.py
+chmod +x watchdog.py
 ```
 
 Modify the `config.json.example` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the sensor you are setting up (see the ***Web server*** section). Remove the hint lines as well.
