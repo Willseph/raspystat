@@ -82,7 +82,7 @@ then
 fi
 
 echo "Removing old cron jobs"
-crontab -l | grep -v '/raspystat/$UNIT/' | crontab -
+crontab -l | grep '/raspystat/$UNIT/' | crontab -
 
 echo "Adding new cron job"
 (crontab -l ; echo "*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/$UNIT/watchdog.py") | crontab -
