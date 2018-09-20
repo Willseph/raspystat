@@ -81,11 +81,8 @@ then
 	echo ""
 fi
 
-echo "Removing old cron jobs"
-crontab -l | grep '/raspystat/$UNIT/' | crontab -
-
-echo "Adding new cron job"
-(crontab -l ; echo "*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/$UNIT/watchdog.py") | crontab -
+echo "Adding cron job"
+((crontab -l | grep -v "/raspystat/$UNIT/") ; echo "*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/$UNIT/watchdog.py") | crontab -
 
 COMMIT=$(eval git log --pretty=format:'%h' -n 1)
 
