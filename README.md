@@ -143,7 +143,7 @@ The script will automatically set up all of the necessary services and jobs to e
 If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab again and remove or comment the previous addition.
 
 
-### Uninstalling
+## Uninstalling
 
 In order to uninstall Raspystat from the Raspberry Pi, it is not recommended to simply delete the repo directory from the device. Uninstallation is quite easy though.
 
