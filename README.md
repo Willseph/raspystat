@@ -124,9 +124,9 @@ Copy the `config.json.example` file to `config.json`:
 cp config.json.example config.json
 ```
 
-Modify the `config.json` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the sensor you are setting up (see the ***Web server*** section).
+Modify the `config.json` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the controller you are setting up (see the ***Web server*** section).
 
-You will also need to specify the BCM-based pin numbers that correspond to the GPIO pins connected to the relay module (see ***Controller wiring*** section) for each setting.
+You will also need to specify the BCM-based pin numbers that correspond to the GPIO pins connected to the relay module (see ***Controller wiring*** section) for the fan/heat/cool settings.
 
 Remove the hint lines as well.
 
