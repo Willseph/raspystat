@@ -19,7 +19,6 @@
 import json
 import os
 import requests
-import subprocess
 import sys
 import time
 import traceback
@@ -27,12 +26,12 @@ import traceback
 #####################################################################
 
 # Constants
+Unit = "sensor"
+ApiObj = "sensors"
 Path = os.path.dirname(os.path.abspath(__file__))+'/..'
-ConfigFileName = Path+'/sensor/config.json'
+ConfigFileName = Path+'/'+Unit+'/config.json'
 DeathTimeSeconds = 120
-
-# Error codes
-ErrorSensorError = 'sensor-error'
+Verbose=False
 
 #####################################################################
 
@@ -57,6 +56,7 @@ def getSafely (key, config):
 def rebootPi ():
 	print 'Rebooting pi in 5 seconds...'
 	time.sleep(5)
+	print 'Current time: '+str(int (time.time ()))
 	print 'Reboot'
 	print '----------'
 	print
@@ -66,17 +66,21 @@ def rebootPi ():
 #####################################################################
 
 needsToReboot = False
+currentTime = -1
 
 try:
-	print '----------'
+	if Verbose:
+		print '----------'
 	currentTime = int (time.time ())
-	print 'Current time: '+str(currentTime)
+	if Verbose:
+		print 'Current time: '+str(currentTime)
 
 	# Loading config
 	with open (ConfigFileName) as configFile:
 		config = json.load (configFile)
 	
 	if not config:
+		print 'Current time: '+str(currentTime)
 		print 'Error loading configuration from '+ConfigFileName
 		sys.exit (1)
 	
@@ -84,34 +88,39 @@ try:
 	secret = getSafely ('secret', config)
 	
 	if not host:
+		print 'Current time: '+str(currentTime)
 		print 'Error: No host specified in '+ConfigFileName
 		sys.exit (1)
 	
 	if not secret:
+		print 'Current time: '+str(currentTime)
 		print 'Error: No secret key specified in '+ConfigFileName
 		sys.exit (1)
 	
 	# Fetching current status
-	sensors = None
+	response = None
 	try:
-		sensors = getFromApi ('sensors', 'sensors', host, secret)
+		response = getFromApi (ApiObj, ApiObj, host, secret)
 	except:
 		print
-		print 'Error occurred getting sensors from API:'
+		print 'Error occurred getting response from API:'
 		tb = traceback.format_exc ()
 		print tb
 		print
 		needsToReboot = True
 	
-	if sensors:
-		if len (sensors) < 1:
-			print 'No sensors with provided secret found in API. Web may not be configured.'
+	if response:
+		if len (response) < 1:
+			print 'No response with provided secret found in API. Web may not be configured.'
+			sys.exit (1)
 		else:
-			sensor = sensors[0]
+			sensor = response[0]
 			sensorTime = sensor['updated']
-			print 'Last update time: '+str(sensorTime)
+			if Verbose:
+				print 'Last update time: '+str(sensorTime)
 			difference = currentTime - sensorTime
-			print 'Time difference: '+str(difference)+' second(s).'
+			if Verbose:
+				print 'Time difference: '+str(difference)+' second(s).'
 			if difference >= DeathTimeSeconds:
 				print 'Sensor has not been updated in longer than '+str(DeathTimeSeconds)+' seconds. This is cause for rebooting.'
 				needsToReboot = True
@@ -126,6 +135,7 @@ except KeyboardInterrupt:
 
 except:
 	print
+	print 'Current time: '+str(currentTime)
 	print 'Error occurred:'
 	tb = traceback.format_exc ()
 	print tb
@@ -134,6 +144,7 @@ if needsToReboot:
 	print 'Something is wrong. We need to reboot.'
 	rebootPi ()
 else:
-	print 'Sensor status is valid. No need to reboot.'
-	print '----------'
-	print
+	if Verbose:
+		print 'Sensor status is valid. No need to reboot.'
+		print '----------'
+		print

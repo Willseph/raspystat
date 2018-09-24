@@ -68,59 +68,26 @@ pip install requests
 Clone this `Raspystat` repo into your home directory and enter the `sensor` subdirectory:
 ```
 cd ~/
-git clone https://github.com/Willseph/raspystat
+git clone https://github.com/willseph/raspystat
 cd raspystat/sensor
 ```
 
-Make the necessary Python scripts executable:
+Copy the `config.json.example` file to `config.json`:
 ```
-chmod +x sensor.py
-chmod +x shutdown.py
-chmod +x watchdog.py
+cp config.json.example config.json
 ```
 
-Modify the `config.json.example` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the sensor you are setting up (see the ***Web server*** section). Remove the hint lines as well.
+Modify the `config.json` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the sensor you are setting up (see the ***Web server*** section). Remove the hint lines as well.
 
-Then, move the file to `config.json`:
+Finally, run the installation script with the `-s` flag (indicating that you are installing as a sensor unit):
 ```
-mv config.json.example config.json
-```
-
-Move or copy the `raspystat-sensor.service` daemon unit file into your system's unit file directory, give it the right permissions, reload your unit files, enable, and finally start the service:
-```
-sudo mv raspystat-sensor.service /etc/systemd/system/raspystat-sensor.service
-sudo chmod 664 /etc/systemd/system/raspystat-sensor.service
-sudo systemctl daemon-reload
-sudo systemctl enable raspystat-sensor.service
-sudo systemctl start raspystat-sensor.service
+cd ~/raspystat
+./install.sh -s
 ```
 
-After a few seconds, you should now see this sensor's temperature begin updating on the web app. If you don't, double-check that you have added the correct information in your `config.json` file.
+The script will automatically set up all of the necessary services and jobs to ensure the sensor stays alive, or in an unrecoverable state, reboots the Pi.
 
-If you are still having trouble, you may need to attempt to run the `sensor.py` script manually and use the output to debug the issue.
-
-To set up the shutdown daemon, repeat the same step as before, but with the `raspystat-sensor-shutdown.service` daemon unit:
-```
-sudo mv raspystat-sensor-shutdown.service /etc/systemd/system/raspystat-sensor-shutdown.service
-sudo chmod 664 /etc/systemd/system/raspystat-sensor-shutdown.service
-sudo systemctl daemon-reload
-sudo systemctl enable raspystat-sensor-shutdown.service
-sudo systemctl start raspystat-sensor-shutdown.service
-```
-
-In order to set up the Watchdog which automatically reboots the Pi if something seems to be going wrong, you will need to edit your crontab:
-```
-crontab -e
-```
-
-Then, add the following line to set up the cron job to execute every two minutes:
-```
-*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/sensor/watchdog.py
-```
-
-The Watchdog job should ensure that, in the event that a network hiccup or other kind of unforseen issue occurs which causes the `sensor.py` script to lock up or exit, the Pi will reboot and things should return to normal.
-
-If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab again and remove or comment the previous addition.
+If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab and remove or comment the watchdog job. From that point, you should be able to debug any issues by manually running the `sensor.py` script in the `raspystat/sensor` directory and checking the output.
 
 
 ### HVAC controller Raspberry Pi installation
@@ -148,61 +115,51 @@ pip install requests
 Clone this `Raspystat` repo into your home directory and enter the `controller` subdirectory:
 ```
 cd ~/
-git clone https://github.com/Willseph/raspystat
+git clone https://github.com/willseph/raspystat
 cd raspystat/controller
 ```
 
-Make the necessary Python scripts executable:
+Copy the `config.json.example` file to `config.json`:
 ```
-chmod +x controller.py
-chmod +x shutdown.py
-chmod +x watchdog.py
+cp config.json.example config.json
 ```
 
-Modify the `config.json.example` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the controller (see the ***Web server*** section). Remove the hint lines as well.
+Modify the `config.json` file with your preferred editor to set up the LAN address to the Raspystat server, as well as the **secret** for the sensor you are setting up (see the ***Web server*** section).
 
-Then, move the file to `config.json`:
-```
-mv config.json.example config.json
-```
+You will also need to specify the BCM-based pin numbers that correspond to the GPIO pins connected to the relay module (see ***Controller wiring*** section) for each setting.
 
-If you are hosting the server on this same Pi, you may use the address `127.0.0.1` for the host. However, it is recommended that you actually use the LAN address instead, because it will act as an additional connectivity check for the watchdog to ensure the controller is still connected to the network.
+Remove the hint lines as well.
 
-Move or copy the `raspystat-controller.service` daemon unit file into your system's unit file directory, give it the right permissions, reload your unit files, enable, and finally start the service:
+If you are hosting the webserver on this same Pi, you may use the address `127.0.0.1` for the host. However, it is recommended that you actually use the LAN address instead, because it will act as an additional connectivity check for the watchdog to ensure the controller is still connected to the network.
+
+Finally, run the installation script with the `-c` flag (indicating that you are installing as a controller unit):
 ```
-sudo mv raspystat-controller.service /etc/systemd/system/raspystat-controller.service
-sudo chmod 664 /etc/systemd/system/raspystat-controller.service
-sudo systemctl daemon-reload
-sudo systemctl enable raspystat-controller.service
-sudo systemctl start raspystat-controller.service
+cd ~/raspystat
+./install.sh -c
 ```
 
-After a few seconds, the yellow warning status on the Raspystat interface should disappear. If you have not set up any sensors yet, you still won't see any temperature reading on the web app. If the yellow warning status on the web app has not gone, double-check that you have added the correct information in your `config.json` file.
-
-If you are still having trouble, you may need to attempt to run the `controller.py` script manually and use the output to debug the issue.
-
-To set up the shutdown daemon, repeat the same step as before, but with the `raspystat-controller-shutdown.service` daemon unit:
-```
-sudo mv raspystat-controller-shutdown.service /etc/systemd/system/raspystat-controller-shutdown.service
-sudo chmod 664 /etc/systemd/system/raspystat-controller-shutdown.service
-sudo systemctl daemon-reload
-sudo systemctl enable raspystat-controller-shutdown.service
-sudo systemctl start raspystat-controller-shutdown.service
-```
-
-In order to set up the Watchdog which automatically reboots the Pi if something seems to be going wrong, you will need to edit your crontab:
-```
-crontab -e
-```
-
-Then, add the following line to set up the cron job to execute every two minutes:
-```
-*/2 * * * * sudo /usr/bin/python /home/pi/raspystat/controller/watchdog.py
-```
-
-The Watchdog job should ensure that, in the event that a network hiccup or other kind of unforseen issue occurs which causes the `controller.py` script to lock up or exit, the Pi will reboot and things should return to normal.
+The script will automatically set up all of the necessary services and jobs to ensure the sensor stays alive, or in an unrecoverable state, reboots the Pi.
 
 If you find yourself in a scenario where the Pi is constantly rebooting, making it difficult to keep an ssh session alive, you will need to quickly modify your crontab again and remove or comment the previous addition.
+
+
+### Uninstalling
+
+In order to uninstall Raspystat from the Raspberry Pi, it is not recommended to simply delete the repo directory from the device. Uninstallation is quite easy though.
+
+First, navigate to the root repo directory:
+```
+cd ~/raspystat
+```
+
+Then, call the `install.sh` script with the `-u` flag (to indicate that you wish to uninstall Raspystat from the Pi):
+```
+./install.sh -u
+```
+
+The script will uninstall the service unit files, as well as any Raspystat-related cron jobs from the system. After this point, you may completely delete the repo.
+
+The log files generated by the watchdog cron job will remain, though. These logs are stored in `/var/log`, and can be removed manually after running the uninstallation script, if desired.
 
 
 ## Authors
