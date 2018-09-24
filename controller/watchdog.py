@@ -26,9 +26,12 @@ import traceback
 #####################################################################
 
 # Constants
+Unit = "controller"
+ApiObj = "controller"
 Path = os.path.dirname(os.path.abspath(__file__))+'/..'
-ConfigFileName = Path+'/controller/config.json'
+ConfigFileName = Path+'/'+Unit+'/config.json'
 DeathTimeSeconds = 120
+Verbose=False
 
 #####################################################################
 
@@ -53,6 +56,7 @@ def getSafely (key, config):
 def rebootPi ():
 	print 'Rebooting pi in 5 seconds...'
 	time.sleep(5)
+	print 'Current time: '+str(int (time.time ()))
 	print 'Reboot'
 	print '----------'
 	print
@@ -62,17 +66,21 @@ def rebootPi ():
 #####################################################################
 
 needsToReboot = False
+currentTime = -1
 
 try:
-	print '----------'
+	if Verbose:
+		print '----------'
 	currentTime = int (time.time ())
-	print 'Current time: '+str(currentTime)
+	if Verbose:
+		print 'Current time: '+str(currentTime)
 
 	# Loading config
 	with open (ConfigFileName) as configFile:
 		config = json.load (configFile)
 	
 	if not config:
+		print 'Current time: '+str(currentTime)
 		print 'Error loading configuration from '+ConfigFileName
 		sys.exit (1)
 	
@@ -80,40 +88,44 @@ try:
 	secret = getSafely ('secret', config)
 	
 	if not host:
+		print 'Current time: '+str(currentTime)
 		print 'Error: No host specified in '+ConfigFileName
 		sys.exit (1)
 	
 	if not secret:
+		print 'Current time: '+str(currentTime)
 		print 'Error: No secret key specified in '+ConfigFileName
 		sys.exit (1)
 	
-	# Fetching controller status
-	controller = None
+	# Fetching status
+	response = None
 	try:
-		controller = getFromApi ('controller', 'controller', host, secret)
+		response = getFromApi (ApiObj, ApiObj, host, secret)
 	except:
 		print
-		print 'Error occurred getting controller from API:'
+		print 'Error occurred getting response from API:'
 		tb = traceback.format_exc ()
 		print tb
 		print
 		needsToReboot = True
 	
-	if controller:
-		updatedTime = getSafely ('updated', controller)
+	if response:
+		updatedTime = getSafely ('updated', response)
 		if not updatedTime:
-			print 'Error occurred getting controller from API.'
+			print 'Error occurred getting response from API.'
 			needsToReboot = True
 		else:
 			updatedTime = int(updatedTime)
-			print 'Last update time: '+str(updatedTime)
+			if Verbose:
+				print 'Last update time: '+str(updatedTime)
 			difference = currentTime - updatedTime
-			print 'Time difference: '+str(difference)+' second(s).'
+			if Verbose:
+				print 'Time difference: '+str(difference)+' second(s).'
 			if difference >= DeathTimeSeconds:
-				print 'Controller has not been updated in longer than '+str(DeathTimeSeconds)+' seconds. This is cause for rebooting.'
+				print 'Unit has not been updated in longer than '+str(DeathTimeSeconds)+' seconds. This is cause for rebooting.'
 				needsToReboot = True
 	else:
-		print 'Error occurred getting controller from API.'
+		print 'Error occurred getting response from API.'
 		needsToReboot = True
 
 except SystemExit:
@@ -126,6 +138,7 @@ except KeyboardInterrupt:
 
 except:
 	print
+	print 'Current time: '+str(currentTime)
 	print 'Error occurred:'
 	tb = traceback.format_exc ()
 	print tb
@@ -134,6 +147,7 @@ if needsToReboot:
 	print 'Something is wrong. We need to reboot.'
 	rebootPi ()
 else:
-	print 'Controller status is valid. No need to reboot.'
-	print '----------'
-	print
+	if Verbose:
+		print 'Unit status is valid. No need to reboot.'
+		print '----------'
+		print
