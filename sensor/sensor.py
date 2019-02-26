@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import RPi.GPIO as GPIO
 import ds18b20
 import json
 import os
@@ -31,6 +32,7 @@ import traceback
 Path = os.path.dirname(os.path.abspath(__file__))+'/..'
 ConfigFileName = Path+'/sensor/config.json'
 LoopDelaySeconds = 5
+GPIO.setmode(GPIO.BCM)
 
 # Error codes
 ErrorExited = 'exited'
@@ -56,6 +58,12 @@ def postToApi (call, data, host, secret):
 	print 'API call failed: ' + str (resp)
 	return False
 
+# Sets a pin to a constant HIGH value
+def enableHotPin (pin):
+	print 'Enabling hot pin '+str(pin)
+	GPIO.setup(pin, GPIO.OUT)
+	GPIO.output(pin, GPIO.HIGH)
+
 #####################################################################
 
 currentTemp = 1
@@ -72,6 +80,7 @@ try:
 	
 	host = getSafely ('host', config)
 	secret = getSafely ('secret', config)
+	hotPins = getSafely ('hotPins', config)
 	
 	if not host:
 		print 'Error: No host specified in '+ConfigFileName
@@ -80,6 +89,10 @@ try:
 	if not secret:
 		print 'Error: No secret key specified in '+ConfigFileName
 		sys.exit (1)
+	
+	if hotPins and len(hotPins) > 0:
+		for pin in hotPins:
+			enableHotPin(pin)
 	
 	# Beginning main loop
 	while True:
@@ -143,6 +156,9 @@ except:
 	print 'Error occurred:'
 	tb = traceback.format_exc ()
 	print tb
+
+print 'Cleaning GPIO'
+GPIO.cleanup()
 
 print 'Attemping one last status update'
 status = {"temp":currentTemp, "error":ErrorExited, "ver":verString}
