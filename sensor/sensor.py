@@ -33,6 +33,7 @@ Path = os.path.dirname(os.path.abspath(__file__))+'/..'
 ConfigFileName = Path+'/sensor/config.json'
 LoopDelaySeconds = 5
 GPIO.setmode(GPIO.BCM)
+HotPinDelaySeconds = 15
 
 # Error codes
 ErrorExited = 'exited'
@@ -93,6 +94,8 @@ try:
 	if hotPins and len(hotPins) > 0:
 		for pin in hotPins:
 			enableHotPin(pin)
+		print 'Hot pin delay...'
+		time.sleep (HotPinDelaySeconds)
 	
 	# Beginning main loop
 	while True:
