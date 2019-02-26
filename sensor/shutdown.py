@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import RPi.GPIO as GPIO
 import json
 import os
 import requests
@@ -26,6 +27,7 @@ import time
 
 # Relay boolean constants. Flipped for Sainsmart relay module.
 ConfigFileName = os.path.dirname(os.path.abspath(__file__))+'/config.json'
+GPIO.setmode(GPIO.BCM)
 
 # Error codes
 ErrorExited = 'exited'
@@ -73,6 +75,9 @@ if not host:
 if not secret:
 	print 'Error: No secret key specified in '+ConfigFileName
 	sys.exit (1)
+
+print 'Cleaning GPIO'
+GPIO.cleanup()
 
 print 'Attemping one last status update'
 status = {"temp":1, "error":ErrorExited}

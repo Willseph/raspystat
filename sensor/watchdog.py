@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import RPi.GPIO as GPIO
 import json
 import os
 import requests
@@ -32,6 +34,7 @@ Path = os.path.dirname(os.path.abspath(__file__))+'/..'
 ConfigFileName = Path+'/'+Unit+'/config.json'
 DeathTimeSeconds = 120
 Verbose=False
+GPIO.setmode(GPIO.BCM)
 
 #####################################################################
 
@@ -54,6 +57,8 @@ def getSafely (key, config):
 
 # Sets a 5-second timer, then forces a shutdown signal
 def rebootPi ():
+	print 'Cleaning GPIO'
+	GPIO.cleanup()
 	print 'Rebooting pi in 5 seconds...'
 	time.sleep(5)
 	print 'Current time: '+str(int (time.time ()))
