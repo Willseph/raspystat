@@ -1,17 +1,11 @@
 <?php
 	class AuthUtils
 	{	
-		const HASHROUNDS = 250000;
 		const SALTLENGTH = 32;
 		
 		public static function generateHash($password, $salt)
 		{
-			$hash = $salt.$password;
-			
-			for($i=0; $i<static::HASHROUNDS; $i++)
-				$hash = hash('sha512', $hash);
-				
-			return $hash;
+			return hash('sha512', $salt.$password);
 		}
 		
 		public static function newSalt()
