@@ -14,7 +14,7 @@
 
 	class Config
 	{
-		const DEBUG = true;
+		const DEBUG = false;
 		const FPATH = 'raspystat';
 		const CONFIG_JSON_NAME = 'raspystat-config.json';
 
