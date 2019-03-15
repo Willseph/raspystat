@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="mobile-web-app-capable" content="yes">
+		<title>Raspystat</title>
+		<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/fonts.css">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/spinner.css">
+		<link rel="icon" type="image/png" href="img/fav-32.png" sizes="32x32">
+		<link rel="icon" type="image/png" href="img/fav-16.png" sizes="16x16">
+		<link rel="shortcut icon" href="img/fav.ico">
+		<link rel="manifest" href="manifest.json">
+		<meta name="description" content="A distributed-sensor Raspberry Pi thermostat solution.">
+		<meta name="apple-mobile-web-app-title" content="Raspystat">
+		<meta name="application-name" content="Raspystat">
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery.animate-colors-min.js"></script>
+		<script src="js/utils.js"></script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script src="js/Chart.bundle.min.js"></script>
+		<script src="js/api.js"></script>
+		<script src="js/app.js"></script>
+	</head>
+	<body>
+		<header id="header">
+			<div class="main-width">
+				<div class="half-width f-l noselect">
+					<div id="thermopi-logo" class="f-l" ><i class="icon icon-raspystat"></i></div>
+					<div class="f-l">&nbsp;Raspy<strong>stat</strong></div>
+					<button id="settings-button" class="btn btn-default off f-l hidden"><i class="icon-cog icon"></i></button>
+					<div class="c-b"></div>
+				</div>
+				<div id="status-icon" class="half-width f-r status-icons fade-color">
+					<div id="status-fan" class="status-icon f-r animate-flicker hidden"><i class="icon-fan logo"></i></div>
+					<div id="status-heat" class="status-icon f-r animate-flicker hidden"><i class="icon-fire logo"></i></div>
+					<div id="status-cool" class="status-icon f-r animate-flicker hidden"><i class="icon-snowflake logo"></i></div>
+					<div id="status-warn" class="status-icon f-r animate-flicker hidden"><i class="icon-warning2 logo"></i></div>
+					<div class="c-b"></div>
+				</div>
+				<div class="c-b"></div>
+			</div>
+		</header>
+		<div class="main-body main-width">
+			<!-- Success -->
+			<div id="success" class="alert alert-dismissible alert-success hidden">
+				<button type="button" class="close">×</button>
+				<span id="success-msg">&nbsp;</span>
+			</div>
+			
+			<!-- Error -->
+			<div id="error" class="alert alert-dismissible alert-danger hidden">
+				<button type="button" class="close">×</button>
+				<span id="error-msg">&nbsp;</span>
+			</div>
+		
+			<!-- Loading indicator -->
+			<div id="loading" class="hidden"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="0.25" stroke-miterlimit="10"/></svg></div>
+			
+			<!-- Login/register windows -->
+			<div id="login" class="hidden">
+				<form class="well login" method="post" action="">
+					<h3>Log in</h3>
+					
+					<div class="form-group">
+						<input type="text" class="form-control" id="login-user-field" placeholder="User" name="login-user">
+					</div>
+					<div class="form-group">
+						<input type="password" class="form-control" id="login-password-field" placeholder="Password" name="login-password">
+					</div>
+					
+					<input type="submit" id="login-submit" value="Log In" class="btn btn-primary">
+				</form>
+			</div>
+			
+			<!-- Main window -->
+			<div id="main" class="hidden noselect cur-d">
+				<div class="row" id="controls-and-sensors">
+					<div class="col-sm-6 ">
+						<div id="observed-temp-wrapper" class="row">
+							<div class="col-xs-12">
+								<div id="observed-temp" class="ta-c fade-color"></div>
+							</div>
+						</div>
+						<div id="control">
+							<div class="row hidden ta-c" id="control-dummy"><div class="set-temp">&ndash;</div></div>
+							<div class="row hidden" id="control-single">
+								<div class="col-xs-12">
+									<div class="row control-row">
+										<div class="col-xs-4 ta-r">
+											<button id="btn-decrement-single" class="control-btn"><i class="icon icon-minus"></i></button>
+										</div>
+										<div id="set-temp-single" class="col-xs-4 ta-c set-temp">
+										</div>
+										<div class="col-xs-4 ta-l">
+											<button id="btn-increment-single" class="control-btn"><i class="icon icon-plus"></i></button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row hidden" id="control-dual">
+								<div class="col-xs-6">
+									<div class="row control-row">
+										<div class="col-xs-4 ta-r">
+											<button id="btn-decrement-min" class="control-btn"><i class="icon icon-minus"></i></button>
+										</div>
+										<div id="set-temp-min" class="col-xs-4 ta-c set-temp">
+										</div>
+										<div class="col-xs-4 ta-l">
+											<button id="btn-increment-min" class="control-btn"><i class="icon icon-plus"></i></button>
+										</div>
+									</div>
+								</div>
+								<div class="col-xs-6">
+									<div class="row control-row">
+										<div class="col-xs-4 ta-r">
+											<button id="btn-decrement-max" class="control-btn"><i class="icon icon-minus"></i></button>
+										</div>
+										<div id="set-temp-max" class="col-xs-4 ta-c set-temp">
+										</div>
+										<div class="col-xs-4 ta-l">
+											<button id="btn-increment-max" class="control-btn"><i class="icon icon-plus"></i></button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" id="control-settings">
+								<div class="col-xs-4 ta-c"><button id="btn-fan" type="button" class="btn btn-default on"><i class="icon icon-fan"></i></button></div>
+								<div class="col-xs-4 ta-c"><button id="btn-heat" type="button" class="btn btn-default off"><i class="icon icon-fire"></i></button></div>
+								<div class="col-xs-4 ta-c"><button id="btn-cool" type="button" class="btn btn-default on"><i class="icon icon-snowflake"></i></button></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<ul id="sensor-list" class="sensor-list"></ul>
+					</div>
+				</div>
+				<div class="row" id="charts">
+					<div class="col-sm-12 ">
+						<div id="charts-wrapper">
+							<canvas id="chart"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Settings window -->
+			<div id="settings" class="hidden">
+				<button class="back-btn"><i class="icon icon-undo2"></i>&nbsp; Back</button>
+				<div class="row">
+					<!-- Controller -->
+					<div class="col-sm-6 noselect cur-d">
+						<h4>Controller</h4>
+					</div>
+					
+					<!-- Sensors -->
+					<div class="col-sm-6 noselect cur-d">
+						<h4>Sensors</h4>
+						<ul id="sensor-list-settings" class="sensor-list"></ul>
+						<button id="btn-new-sensor"><i class="icon icon-plus"></i>New&nbsp;Sensor</button>
+					</div>
+				</div>
+				
+				<div class="row">
+					<!-- Interface -->
+					<div class="col-sm-12 noselect cur-d">
+						<h4>Interface</h4>
+						<ul id="interface-settings">
+							<li class="card settings-card settings-card-toggle">
+								<div class="settings-label f-l noselect cur-d">Dark theme</div>
+								<div class="toggle-switch f-r noselect">
+									<label for="toggle-dark-theme"><input type="checkbox" id="toggle-dark-theme"/><span class="switch"></span><span class="toggle"></span></label>
+								</div>
+								<div class="c-b"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				var match = window.location.hash.match(/^#error:(.+)/);
+				if(match && match.length >=2) {
+					var error = decodeURIComponent(match[1].replace('+',' '));
+					if(error) {
+						jQuery('#error-msg').text(error);
+						jQuery('#error').removeClass('hidden');
+					}
+				}
+			});
+		</script>
+	</body>
+</html>
