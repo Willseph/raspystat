@@ -16,16 +16,12 @@
 	{
 		const DEBUG = false;
 		const FPATH = 'raspystat';
+		const CONFIG_JSON_NAME = 'raspystat-config.json';
 		
 		const CONTROLLER_DELAY_LIMIT = 60;
 		const SENSOR_DELAY_LIMIT = 60;
-		
-		const IFTTT_KEY = ""; //TODO: Get from external file
-		const TLS_IGNORED = false; //TODO: Get from external file
-		const ALLOW_LAN_GUESTS = false;
 				
-		public static $DbLocation;
-		public static $DbConfig;
+		public static $ConfigOptions = null;
 		
 		public static function run () {
 			date_default_timezone_set('UTC');
@@ -52,30 +48,20 @@
 		}
 		
 		public static function isLocal () {
-			return static::isCron() === true || static::isSelf() === true || (static::ALLOW_LAN_GUESTS && static::isLan() === true);
+			return static::isCron() === true || static::isSelf() === true || (static::$ConfigOptions['allowLanGuests'] === true && static::isLan() === true);
 		}
 		
 		public static function isSecure () {
-			return static::isLocal() || $_SERVER["HTTPS"] === "on" || static::TLS_IGNORED;
+			return static::isLocal() || $_SERVER["HTTPS"] === "on" || static::$ConfigOptions['tlsIgnored'] === true;
 		}
 		
 		static function getDbConfig() {
-			static::$DbLocation = sprintf('%s/../../../raspystat-db.json', __DIR__);
-			static::$DbConfig = null;
+			$configLocation = sprintf('%s/../../../%s', __DIR__, static::CONFIG_JSON_NAME);
 			
-			if(file_exists(static::$DbLocation)) {
-				$json = trim(file_get_contents(static::$DbLocation));
+			if(file_exists($configLocation)) {
+				$json = trim(file_get_contents($configLocation));
 				if($json) {
-					$dbArray = json_decode($json, true);
-					if(
-						$dbArray 
-						&& isset($dbArray['dbname']) && trim($dbArray['dbname']) 
-						&& isset($dbArray['dbuser']) && trim($dbArray['dbuser']) 
-						&& isset($dbArray['dbpass']) && trim($dbArray['dbpass']) 
-						&& isset($dbArray['dbhost']) && trim($dbArray['dbhost'])
-					) {
-						static::$DbConfig = $dbArray;
-					}
+					static::$ConfigOptions = json_decode($json, true);
 				}
 			}
 		}
