@@ -1,11 +1,7 @@
 <?php
 	require_once(sprintf('%s/../config.php', __DIR__));
 	
-	$key = Utils::v('key');
-	if ($key !== Config::IFTTT_KEY) {
-		AuthUtils::requireValidToken();
-	}
-	
+	AuthUtils::requireValidToken();
 	$isAdmin = AuthUtils::isAdminToken(Utils::v('token'));
 	
 	$secret = Utils::v('secret');
