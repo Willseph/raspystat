@@ -22,6 +22,7 @@
 		
 		const IFTTT_KEY = ""; //TODO: Get from external file
 		const TLS_IGNORED = false; //TODO: Get from external file
+		const ALLOW_LAN_GUESTS = false;
 				
 		public static $DbLocation;
 		public static $DbConfig;
@@ -43,11 +44,15 @@
 		}
 		
 		public static function isLan() {
-			return strrpos($_SERVER['HTTP_HOST'], '192.168') === 0 || $_SERVER['HTTP_HOST'] === '127.0.0.1';
+			return strrpos($_SERVER['HTTP_HOST'], '192.168') === 0;
+		}
+
+		public static function isSelf() {
+			return $_SERVER['HTTP_HOST'] === '127.0.0.1';
 		}
 		
 		public static function isLocal () {
-			return static::isCron() === true || static::isLan() === true;
+			return static::isCron() === true || static::isSelf() === true || (static::ALLOW_LAN_GUESTS && static::isLan() === true);
 		}
 		
 		public static function isSecure () {
