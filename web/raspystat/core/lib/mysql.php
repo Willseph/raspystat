@@ -4,7 +4,7 @@ class MySQL
     //Creates a connection to the database.
     private static function createConnection()
     {
-        return new mysqli(Config::$DbConfig['dbhost'], Config::$DbConfig['dbuser'], Config::$DbConfig['dbpass'], Config::$DbConfig['dbname']);
+        return new mysqli(Config::$ConfigOptions['dbhost'], Config::$ConfigOptions['dbuser'], Config::$ConfigOptions['dbpass'], Config::$ConfigOptions['dbname']);
     }
     
     //Generates a query given a mysqli object, a .NET-like string template and an array of arguments.
